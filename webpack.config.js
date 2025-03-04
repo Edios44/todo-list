@@ -13,7 +13,7 @@ module.exports = {
   devServer: {
     watchFiles: ["./src/template.html"],
   },
-  plugins[
+  plugins:[
     new HtmlWebpackPlugin({
       template: "./src/template.html"
     })
