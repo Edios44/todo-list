@@ -14,8 +14,8 @@ class TodoList {
     this.description = description
   }
 
-  addItem = (title,description,dueDate,priority)=>{
-    const item = new Item(title,description,dueDate,priority);
+  addItem = (title,description,dueDate,priority,id)=>{
+    const item = new Item(title,description,dueDate,priority,id);
     this.list.push(item);
   }
   deleteItem = (id)=>{

@@ -74,12 +74,14 @@ function newListForm() {
 }
 
 
-function confirmTask(e,task,currentLi,input,tasks) {
+function confirmTask(e,task,currentLi,input,tasks,id) {
   if (event.key == 'Enter'){
     task.title = input.value
     currentLi.textContent = input.value
     console.log(task.title)
-    currentLi.addEventListener("click", (e)=>{newTask("hh",tasks,task,e)}, {once: true})
+    currentLi.addEventListener("click", (e)=>{newTask("Uncaught InternalError: too much recursionhh",tasks,task,e)}, {once: true})
+    displayContent(currentList)
+    sortTasksId()
   }
 
   if (event.key == 'Escape') {
@@ -90,6 +92,8 @@ function confirmTask(e,task,currentLi,input,tasks) {
     }
     else {
       currentLi.remove()
+      currentList.list.splice(id,1)
+      console.log(currentList.list)
     }
  }
 }
@@ -109,18 +113,19 @@ function newTask(oldTask,tasks,task,ev) {
     const newli = document.createElement("li")
     const input = document.createElement("input")
     input.setAttribute("type", "text")
-    newli.id = currentList.length
+    newli.id = currentList.list.length
     newli.appendChild(input)
     tasks.appendChild(newli)
-    let id = currentList.length
+    let id = currentList.list.length
     currentList.addItem(undefined,undefined,undefined,undefined, id)
     currentList.list.map((item) => {
+      console.log(item.id)
       if (item.id == id){
         task = item
+        console.log(item)
       }
     })
-    console.log(task)
-    input.addEventListener("keydown",(e)=>{ confirmTask(e,task,newli,input,tasks) })
+    input.addEventListener("keydown",(e)=>{ confirmTask(e,task,newli,input,tasks,id) })
   }
   else{
     let id = ev.target.id
@@ -135,23 +140,48 @@ function newTask(oldTask,tasks,task,ev) {
   }
 }
 
+function removeTask(id) {
+  console.log(id)
+  currentList.list.splice(Number(id),1)
+  console.log(currentList.list)
+  sortTasksId()
+  displayContent(currentList)
+}
+
 function displayContent(currentList) {
   const list = document.createElement("ul")
   list.id = "tasks"
   doms.todo.textContent = ''
+
   let i = 0
   
   currentList.list.forEach( obj => {
     const li = document.createElement("li")
-    li.textContent = obj.title
-    li.id = i
+    const title = document.createElement("span")
+    title.textContent = obj.title
+    let id = i
+    title.id = id
+    const removeTask_btn = document.createElement("button")
+    removeTask_btn.classList.add("remove-btn")
+    removeTask_btn.textContent = "X"
+    removeTask_btn.addEventListener("click", ()=>{ removeTask(id)})
+    li.appendChild(title)
     list.appendChild(li)
     i++
-    li.addEventListener("click", (e)=>{newTask("hh",list,obj,e)}, {once : true})
+    title.addEventListener("click", (e)=>{newTask("hh",list,obj,e)}, {once : true})
+
+    li.appendChild(removeTask_btn)
   })
   doms.todo.appendChild(list)
   addTask()
   doms.content.appendChild(doms.todo)
+}
+
+function sortTasksId() {
+  const tasks = document.querySelectorAll("#tasks")
+  tasks.forEach((task, i)=>{
+    task.id = i
+  })
 }
 
 export {newList, newListForm,displayLists,lists,displayContent,currentList}
