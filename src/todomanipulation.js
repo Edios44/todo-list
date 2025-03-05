@@ -2,11 +2,12 @@ import { Item,TodoList } from "./todotemplate.js";
 
 const defaultList = new TodoList("defaultList","this is a default list")
 const lists = [defaultList]
-defaultList.addItem("example item","example description example description", "date", "2")
-defaultList.addItem("example item2","desc desc","date2", "4")
+defaultList.addItem("example item","example description example description", "date", "2",0)
+defaultList.addItem("example item2","desc desc","date2", "4",1)
 
 
 let currentList = lists[0]
+console.log(currentList)
 
 const doms = (function () {
   const sidebar = document.querySelector("#sidebar")
@@ -73,39 +74,71 @@ function newListForm() {
 }
 
 
-function confirmTask(e,obj,currentLi,input) {
+function confirmTask(e,task,currentLi,input,tasks) {
   if (event.key == 'Enter'){
-    obj.title = input.value
+    task.title = input.value
     currentLi.textContent = input.value
-    console.log(obj.title)
-    currentLi.addEventListener("click", (e)=>{changeTask(e,obj)}, {once: true})
+    console.log(task.title)
+    currentLi.addEventListener("click", (e)=>{newTask("hh",tasks,task,e)}, {once: true})
   }
 
   if (event.key == 'Escape') {
-    currentLi.textContent = obj.title
-    currentLi.addEventListener("click", (e)=>{changeTask(e,obj)}, {once: true})
-  }
+    if(task.title !== undefined){
+      currentLi.textContent = task.title
+      console.log("task.title esc :"+task.title)
+      currentLi.addEventListener("click", (e)=>{newTask("hh",tasks,task,e)}, {once: true})
+    }
+    else {
+      currentLi.remove()
+    }
+ }
 }
 
-function changeTask(e,obj) {
-  let id = e.target.id
-  const input = document.createElement("input")
-  input.setAttribute("type", "text")
+function addTask() {
+  const addItem_btn = document.createElement("button")
+  addItem_btn.textContent = "Add task"
+  addItem_btn.classList.add("btn-new")
+  addItem_btn.id = "new-task"
+  const tasks = document.querySelector("#tasks")
+  doms.todo.appendChild(addItem_btn)
+  addItem_btn.addEventListener("click", (e)=>{newTask("",tasks,undefined,e)})
+}
 
-  const currentLi = document.querySelector(`#todolists ul [id='${id}']`)
-  input.value = currentLi.textContent
-  currentLi.textContent = ''
-  currentLi.appendChild(input)
-  input.addEventListener("keydown", (e)=>{ confirmTask(e,obj,currentLi,input) })
+function newTask(oldTask,tasks,task,ev) {
+  if(oldTask==""){
+    const newli = document.createElement("li")
+    const input = document.createElement("input")
+    input.setAttribute("type", "text")
+    newli.id = currentList.length
+    newli.appendChild(input)
+    tasks.appendChild(newli)
+    let id = currentList.length
+    currentList.addItem(undefined,undefined,undefined,undefined, id)
+    currentList.list.map((item) => {
+      if (item.id == id){
+        task = item
+      }
+    })
+    console.log(task)
+    input.addEventListener("keydown",(e)=>{ confirmTask(e,task,newli,input,tasks) })
+  }
+  else{
+    let id = ev.target.id
+    const currentLi = document.querySelector(`#todolists ul [id='${id}']`)
+
+    const input = document.createElement("input")
+    input.setAttribute("type", "text")
+    input.value = currentLi.textContent
+    currentLi.textContent = ''
+    currentLi.appendChild(input)
+    input.addEventListener("keydown", (e)=>{ confirmTask(e,task,currentLi,input,tasks)})
+  }
 }
 
 function displayContent(currentList) {
   const list = document.createElement("ul")
-  const addItem_btn = document.createElement("button")
-  addItem_btn.textContent = "Add task"
+  list.id = "tasks"
   doms.todo.textContent = ''
-
-
   let i = 0
   
   currentList.list.forEach( obj => {
@@ -114,10 +147,10 @@ function displayContent(currentList) {
     li.id = i
     list.appendChild(li)
     i++
-    li.addEventListener("click", (e)=>{changeTask(e,obj)}, {once : true})
+    li.addEventListener("click", (e)=>{newTask("hh",list,obj,e)}, {once : true})
   })
   doms.todo.appendChild(list)
-  doms.todo.appendChild(addItem_btn)
+  addTask()
   doms.content.appendChild(doms.todo)
 }
 
