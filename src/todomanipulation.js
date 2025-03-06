@@ -94,12 +94,13 @@ function newListForm() {
   });
 }
 
-function confirmTask(e, task, currentLi, input, dateli, tasks, id) {
+function confirmTask(e, task, currentLi, input, date, tasks, id) {
   if (event.key == "Enter") {
     task.title = input.value;
-    task.dueDate = dateli.value;
-    console.log(dateli.value);
-    console.log("wow");
+    if (date.value !== undefined) {
+      task.dueDate = date.value;
+    }
+    else{task.dueDate = date }
     currentLi.addEventListener(
       "click",
       (e) => {
@@ -108,6 +109,7 @@ function confirmTask(e, task, currentLi, input, dateli, tasks, id) {
       { once: true },
     );
     displayContent(currentList);
+    console.log(currentList.list)
     sortTasksId();
   }
 
@@ -137,12 +139,12 @@ function addTask() {
   const tasks = document.querySelector("#tasks");
   doms.todo.appendChild(addItem_btn);
   addItem_btn.addEventListener("click", (e) => {
-    newTask("", tasks, undefined, e);
+    newTask(tasks, undefined, e);
   });
 }
 
-function newTask(oldTask, tasks, task, ev) {
-  if (oldTask == "") {
+function newTask(tasks, task, e) {
+  if (task == undefined) {
     const newli = document.createElement("li");
     newli.id = currentList.list.length;
     newli.classList.add("task-list");
@@ -171,7 +173,7 @@ function newTask(oldTask, tasks, task, ev) {
       confirmTask(e, task, newli, input, dateli, tasks, id);
     });
   } else {
-    let id = ev.target.id;
+    let id = e.target.id;
     const currentLi = document.querySelector(`#todolists ul [id='${id}']`);
 
     const input = document.createElement("input");
@@ -180,8 +182,9 @@ function newTask(oldTask, tasks, task, ev) {
     input.value = currentLi.textContent;
     currentLi.textContent = "";
     currentLi.appendChild(input);
+    console.log(task.dueDate)
     input.addEventListener("keydown", (e) => {
-      confirmTask(e, task, currentLi, input, tasks);
+      confirmTask(e, task, currentLi, input, task.dueDate, tasks);
     });
   }
 }
@@ -211,6 +214,7 @@ function displayContent(currentList) {
     title.id = id;
     const dueDate = document.createElement("span");
     dueDate.textContent = obj.dueDate
+    dueDate.classList.add('due-date')
     const removeTask_btn = document.createElement("button");
     removeTask_btn.classList.add("remove-btn");
     removeTask_btn.textContent = "X";
@@ -224,7 +228,7 @@ function displayContent(currentList) {
     title.addEventListener(
       "click",
       (e) => {
-        newTask("hh", list, obj, e);
+        newTask(list, obj, e);
       },
       { once: true },
     );
