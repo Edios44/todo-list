@@ -1,3 +1,7 @@
+*{
+  list-style-type: none;
+}
+
 body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -36,3 +40,31 @@ body {
   opacity: 0.6;
 }
 
+/* task list */
+.task-list {
+  border: 2px solid grey;
+  margin: 1em;
+  padding: 0.4em;
+  border-radius: 0.5em;
+  display: flex;
+  justify-content: space-between;
+}
+.btn-new{
+  border: none;
+  min-width: 70%;
+  align-self: center;
+}
+#todolists{
+  display: flex;
+  flex-direction: column;
+  padding: 2em;
+  flex-wrap: wrap;
+}
+
+.task-title:hover{
+  background-color: lightgray;
+}
+.task-title{
+  padding-left: 2em;
+  padding-right: 2em;
+}
