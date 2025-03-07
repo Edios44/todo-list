@@ -1,6 +1,8 @@
 import { Item, TodoList } from "./todotemplate.js";
 import { format, compareAsc, endOfToday } from "date-fns";
 
+import {newTask,changeTaskTitle,changeTaskDate,removeTask} from './tasks.js'
+
 const defaultList = new TodoList("defaultList", "this is a default list");
 const lists = [defaultList];
 defaultList.addItem(
@@ -94,158 +96,45 @@ function newListForm() {
   });
 }
 
-function confirmTask(e, task, currentLi, input, date, tasks, id) {
-  if (event.key == "Enter") {
-    task.title = input.value;
-    if (date.value !== undefined) {
-      task.dueDate = date.value;
-    }
-    else{task.dueDate = date }
-    currentLi.addEventListener(
-      "click",
-      (e) => {
-        newTask("recursionhh", tasks, task, e);
-      },
-      { once: true },
-    );
-    displayContent(currentList);
-    console.log(currentList.list)
-    sortTasksId();
-  }
-
-  if (event.key == "Escape") {
-    if (task.title !== undefined) {
-      currentLi.textContent = task.title;
-      currentLi.addEventListener(
-        "click",
-        (e) => {
-          newTask("hh", tasks, task, e);
-        },
-        { once: true },
-      );
-    } else {
-      currentLi.remove();
-      currentList.list.splice(id, 1);
-      console.log(currentList.list);
-    }
-  }
-}
-
-function addTask() {
-  const addItem_btn = document.createElement("button");
-  addItem_btn.textContent = "+ Add task";
-  addItem_btn.classList.add("btn-new");
-  addItem_btn.id = "new-task";
-  const tasks = document.querySelector("#tasks");
-  doms.todo.appendChild(addItem_btn);
-  addItem_btn.addEventListener("click", (e) => {
-    newTask(tasks, undefined, e);
-  });
-}
-
-function newTask(tasks, task, e) {
-  if (task == undefined) {
-    const newli = document.createElement("li");
-    newli.id = currentList.list.length;
-    newli.classList.add("task-list");
-
-    const input = document.createElement("input");
-    input.classList.add("input");
-    input.setAttribute("type", "text");
-    newli.appendChild(input);
-
-    const dateli = document.createElement("input");
-    dateli.setAttribute("type", "date");
-    dateli.classList.add("date-selector");
-    dateli.value = format(endOfToday(),'yyyy-MM-dd')
-    newli.appendChild(dateli);
-
-    tasks.appendChild(newli);
-    let id = currentList.list.length;
-    currentList.addItem(undefined, undefined, undefined, undefined, id);
-    currentList.list.map((item) => {
-      if (item.id == id) {
-        task = item;
-        console.log(item);
-      }
-    });
-    newli.addEventListener("keydown", (e) => {
-      confirmTask(e, task, newli, input, dateli, tasks, id);
-    });
-  } else {
-    let id = e.target.id;
-    const currentLi = document.querySelector(`#todolists ul [id='${id}']`);
-
-    const input = document.createElement("input");
-    input.classList.add("input");
-    input.setAttribute("type", "text");
-    input.value = currentLi.textContent;
-    currentLi.textContent = "";
-    currentLi.appendChild(input);
-    console.log(task.dueDate)
-    input.addEventListener("keydown", (e) => {
-      confirmTask(e, task, currentLi, input, task.dueDate, tasks);
-    });
-  }
-}
-
-function removeTask(id) {
-  console.log(id);
-  currentList.list.splice(Number(id), 1);
-  console.log(currentList.list);
-  sortTasksId();
-  displayContent(currentList);
-}
-
 function displayContent(currentList) {
   const list = document.createElement("ul");
   list.id = "tasks";
   doms.todo.textContent = "";
 
-  let i = 0;
-
-  currentList.list.forEach((obj) => {
+  currentList.list.forEach((obj,indx) => {
     const li = document.createElement("li");
     li.classList.add("task-list");
     const title = document.createElement("span");
     title.classList.add("task-title");
     title.textContent = obj.title;
-    let id = i;
-    title.id = id;
+    title.addEventListener("click",(e) => {changeTaskTitle(e,obj)},{ once: true });
+
     const dueDate = document.createElement("span");
     dueDate.textContent = obj.dueDate
     dueDate.classList.add('due-date')
+    dueDate.addEventListener('click', (e)=> {changeTaskDate(e,obj)})
+
     const removeTask_btn = document.createElement("button");
     removeTask_btn.classList.add("remove-btn");
     removeTask_btn.textContent = "X";
-    removeTask_btn.addEventListener("click", () => {
-      removeTask(id);
-    });
+    removeTask_btn.addEventListener("click", () => {removeTask(indx)});
+
     li.appendChild(title);
     li.appendChild(dueDate);
-    list.appendChild(li);
-    i++;
-    title.addEventListener(
-      "click",
-      (e) => {
-        newTask(list, obj, e);
-      },
-      { once: true },
-    );
-
     li.appendChild(removeTask_btn);
+    list.appendChild(li);
   });
   doms.todo.appendChild(list);
-  addTask();
+  const addItem_btn = document.createElement("button");
+  addItem_btn.textContent = "+ Add task";
+  addItem_btn.classList.add("btn-new");
+  addItem_btn.id = "new-task";
+  doms.todo.appendChild(addItem_btn);
+  addItem_btn.addEventListener("click", (e) => {newTask(e)});
+
   doms.content.appendChild(doms.todo);
 }
 
-function sortTasksId() {
-  const tasks = document.querySelectorAll("#tasks");
-  tasks.forEach((task, i) => {
-    task.id = i;
-  });
-}
 
 export {
   newList,
